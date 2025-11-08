@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTech Solutions - Cap Table Simulation</title>
+    <meta name="description" content="Interactive cap table simulation for entrepreneurial finance education">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px;
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .step-circle.active {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #cbd5e0;
+            margin: 0 10px;
+        }
+
+        .step-line.active {
+            background: #667eea;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .alert {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-left: 4px solid #f56565;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .alert-warning {
+            background: #fffaf0;
+            border-color: #fbd38d;
+            border-left-color: #ed8936;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .info-box h4 {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .info-box.yellow {
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .info-box.blue {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .stakeholder-list {
+            margin: 20px 0;
+        }
+
+        .stakeholder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f7fafc;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .stakeholder-item.founder {
+            background: #f0f4ff;
+        }
+
+        .stakeholder-item.investor {
+            background: #f0fdf4;
+        }
+
+        .stakeholder-item.option-pool {
+            background: #faf5ff;
+        }
+
+        .stakeholder-name {
+            font-weight: 600;
+        }
+
+        .stakeholder-role {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .stakeholder-value {
+            text-align: right;
+        }
+
+        .stakeholder-percentage {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stakeholder-shares {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #f7fafc;
+        }
+
+        .checkbox-group {
+            margin: 20px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-content {
+            flex: 1;
+        }
+
+        .checkbox-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .checkbox-description {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .insights-box {
+            background: #eff6ff;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .insights-box h4 {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .insights-box ul {
+            list-style: none;
+        }
+
+        .insights-box li {
+            padding: 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .insights-box li::before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .warning-text {
+            color: #c53030;
+            font-weight: 600;
+        }
+
+        .success-text {
+            color: #22543d;
+            font-weight: 600;
+        }
+
+        .exit-scenario {
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+
+        .exit-scenario h4 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #2d3748;
+        }
+
+        .exit-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .exit-metric:last-child {
+            border-bottom: none;
+        }
+
+        .exit-value {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .question-box {
+            background: #f7fafc;
+            padding: 16px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        .question-box strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .toggle-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .toggle-btn:hover {
+            background: #cbd5e0;
+        }
+
+        .calculations-detail {
+            background: #f7fafc;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .calculations-detail div {
+            padding: 6px 0;
+        }
+
+        .save-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .reset-btn {
+            background: #f56565;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background: #e53e3e;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .progress-bar {
+                overflow-x: auto;
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="save-indicator" id="saveIndicator">✓ Progress saved</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>FitTech Solutions Cap Table Simulation</h1>
+            <p>An Interactive Learning Exercise for Entrepreneurial Finance Students</p>
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+            <!-- Progress steps will be generated here -->
+        </div>
+
+        <div class="content" id="content">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // State management with localStorage
+        const STATE_KEY = 'captable_simulation_state';
+
+        const defaultState = {
+            round: 0,
+            decisions: {
+                seedOptionPoolTiming: null,
+                seriesAPoolIncrease: null,
+                downRoundParticipation: {
+                    summitVentures: false,
+                    seedAngels: false,
+                    sarah: false
+                }
+            },
+            capTable: {
+                authorizedShares: 10000000,
+                founders: [
+                    { name: 'Sarah Chen', role: 'CEO', shares: 4000000, percentage: 40 },
+                    { name: 'Mike Rodriguez', role: 'CTO', shares: 3500000, percentage: 35 },
+                    { name: 'Priya Patel', role: 'COO', shares: 2500000, percentage: 25 }
+                ],
+                optionPool: { allocated: 0, reserved: 0 },
+                investors: []
+            },
+            showCalculations: false
+        };
+
+        // Load state from localStorage or use default
+        function loadState() {
+            const saved = localStorage.getItem(STATE_KEY);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error loading saved state:', e);
+                    return { ...defaultState };
+                }
+            }
+            return { ...defaultState };
+        }
+
+        // Save state to localStorage
+        function saveState(state) {
+            localStorage.setItem(STATE_KEY, JSON.stringify(state));
+            showSaveIndicator();
+        }
+
+        // Show save indicator
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        // Reset simulation
+        function resetSimulation() {
+            if (confirm('Are you sure you want to reset the simulation? All progress will be lost.')) {
+                localStorage.removeItem(STATE_KEY);
+                state = { ...defaultState };
+                render();
+            }
+        }
+
+        let state = loadState();
+
+        // Helper functions
+        function calculateFullyDiluted(capTable) {
+            const founderShares = capTable.founders.reduce((sum, f) => sum + f.shares, 0);
+            const investorShares = capTable.investors.reduce((sum, inv) => sum + inv.shares, 0);
+            const optionShares = capTable.optionPool.reserved;
+            return founderShares + investorShares + optionShares;
+        }
+
+        function formatNumber(num) {
+            return num.toLocaleString();
+        }
+
+        function formatCurrency(num) {
+            return '$' + num.toLocaleString();
+        }
+
+        function formatPercent(num) {
+            return num.toFixed(2) + '%';
+        }
+
+        // Round handlers
+        function handleSeedRound(optionPoolTiming) {
+            state.decisions.seedOptionPoolTiming = optionPoolTiming;
+            
+            const investment = 1500000;
+            const preMoney = 4500000;
+            const optionPoolPercent = 0.15;
+            
+            let newCapTable = JSON.parse(JSON.stringify(state.capTable));
+            let totalShares = 10000000;
+            
+            if (optionPoolTiming === 'pre-money') {
+                const optionShares = Math.round(totalShares * optionPoolPercent / (1 - optionPoolPercent));
+                newCapTable.optionPool.reserved = optionShares;
+                totalShares += optionShares;
+                
+                const postMoney = preMoney + investment;
+                const investorOwnership = investment / postMoney;
+                const investorShares = Math.round(totalShares * investorOwnership / (1 - investorOwnership));
+                
+                newCapTable.investors.push({
+                    name: 'Seed Angels',
+                    round: 'Seed',
+                    shares: investorShares,
+                    investment: investment,
+                    pricePerShare: investment / investorShares,
+                    liquidationPreference: '1x non-participating',
+                    preferenceAmount: investment
+                });
+                
+                totalShares += investorShares;
+                
+            } else {
+                const postMoney = preMoney + investment;
+                const investorOwnership = investment / postMoney;
+                const investorShares = Math.round(totalShares * investorOwnership / (1 - investorOwnership));
+                
+                newCapTable.investors.push({
+                    name: 'Seed Angels',
+                    round: 'Seed',
+                    shares: investorShares,
+                    investment: investment,
+                    pricePerShare: investment / investorShares,
+                    liquidationPreference: '1x non-participating',
+                    preferenceAmount: investment
+                });
+                
+                totalShares += investorShares;
+                
+                const optionShares = Math.round(totalShares * optionPoolPercent / (1 - optionPoolPercent));
+                newCapTable.optionPool.reserved = optionShares;
+                totalShares += optionShares;
+            }
+            
+            newCapTable.founders = newCapTable.founders.map(f => ({
+                ...f,
+                percentage: (f.shares / totalShares * 100)
+            }));
+            
+            state.capTable = newCapTable;
+            state.round = 1;
+            saveState(state);
+            render();
+        }
+
+        function handleSeriesA(increasePool) {
+            state.decisions.seriesAPoolIncrease = increasePool;
+            
+            let newCapTable = JSON.parse(JSON.stringify(state.capTable));
+            let totalShares = calculateFullyDiluted(newCapTable);
+            
+            if (increasePool) {
+                const targetPoolPercent = 0.18;
+                const additionalPoolShares = Math.round(
+                    (totalShares * targetPoolPercent / (1 - targetPoolPercent)) - newCapTable.optionPool.reserved
+                );
+                newCapTable.optionPool.reserved += additionalPoolShares;
+                newCapTable.optionPool.allocated = Math.round(newCapTable.optionPool.reserved * 0.05);
+                totalShares += additionalPoolShares;
+            }
+            
+            const investment = 8000000;
+            const preMoney = 20000000;
+            const postMoney = preMoney + investment;
+            const investorOwnership = investment / postMoney;
+            const investorShares = Math.round(totalShares * investorOwnership / (1 - investorOwnership));
+            
+            newCapTable.investors.push({
+                name: 'Summit Ventures',
+                round: 'Series A',
+                shares: investorShares,
+                investment: investment,
+                pricePerShare: investment / investorShares,
+                liquidationPreference: '1x participating',
+                preferenceAmount: investment,
+                antiDilution: 'broad-based weighted average'
+            });
+            
+            totalShares += investorShares;
+            
+            newCapTable.founders = newCapTable.founders.map(f => ({
+                ...f,
+                percentage: (f.shares / totalShares * 100)
+            }));
+            
+            newCapTable.investors = newCapTable.investors.map(inv => ({
+                ...inv,
+                percentage: (inv.shares / totalShares * 100)
+            }));
+            
+            state.capTable = newCapTable;
+            state.round = 2;
+            saveState(state);
+            render();
+        }
+
+        function handleSeriesB(participation) {
+            state.decisions.downRoundParticipation = participation;
+            
+            let newCapTable = JSON.parse(JSON.stringify(state.capTable));
+            let totalShares = calculateFullyDiluted(newCapTable);
+            
+            const investment = 5000000;
+            const preMoney = 18000000;
+            const postMoney = preMoney + investment;
+            
+            const seriesAInvestor = newCapTable.investors.find(inv => inv.round === 'Series A');
+            if (seriesAInvestor && seriesAInvestor.antiDilution === 'broad-based weighted average') {
+                const oldPrice = seriesAInvestor.pricePerShare;
+                const newPrice = preMoney / totalShares;
+                
+                const newConversionPrice = (
+                    (oldPrice * seriesAInvestor.shares) + 
+                    (newPrice * (investment / newPrice))
+                ) / (seriesAInvestor.shares + (investment / newPrice));
+                
+                const additionalShares = Math.round(
+                    seriesAInvestor.shares * (oldPrice / newConversionPrice - 1)
+                );
+                
+                seriesAInvestor.shares += additionalShares;
+                seriesAInvestor.antiDilutionAdjustment = additionalShares;
+                totalShares += additionalShares;
+            }
+            
+            const investorOwnership = investment / postMoney;
+            const investorShares = Math.round(totalShares * investorOwnership / (1 - investorOwnership));
+            
+            newCapTable.investors.push({
+                name: 'Phoenix Capital',
+                round: 'Series B',
+                shares: investorShares,
+                investment: investment,
+                pricePerShare: investment / investorShares,
+                liquidationPreference: '2x non-participating',
+                preferenceAmount: investment * 2,
+                antiDilution: 'full ratchet'
+            });
+            
+            totalShares += investorShares;
+            
+            if (participation.summitVentures) {
+                const additionalInvestment = 2000000;
+                const additionalShares = Math.round(additionalInvestment / (investment / investorShares));
+                seriesAInvestor.shares += additionalShares;
+                seriesAInvestor.investment += additionalInvestment;
+                seriesAInvestor.followOn = additionalInvestment;
+                totalShares += additionalShares;
+            }
+            
+            if (participation.sarah) {
+                const sarahInvestment = 500000;
+                const sarahAdditionalShares = Math.round(sarahInvestment / (investment / investorShares));
+                const sarah = newCapTable.founders.find(f => f.name === 'Sarah Chen');
+                sarah.shares += sarahAdditionalShares;
+                sarah.personalInvestment = sarahInvestment;
+                totalShares += sarahAdditionalShares;
+            }
+            
+            const seedInvestor = newCapTable.investors.find(inv => inv.round === 'Seed');
+            if (seedInvestor && !participation.seedAngels) {
+                seedInvestor.convertedToCommon = true;
+                seedInvestor.liquidationPreference = 'none (converted to common)';
+                seedInvestor.preferenceAmount = 0;
+            }
+            
+            newCapTable.founders = newCapTable.founders.map(f => ({
+                ...f,
+                percentage: (f.shares / totalShares * 100)
+            }));
+            
+            newCapTable.investors = newCapTable.investors.map(inv => ({
+                ...inv,
+                percentage: (inv.shares / totalShares * 100)
+            }));
+            
+            newCapTable.optionPool.percentage = (newCapTable.optionPool.reserved / totalShares * 100);
+            
+            state.capTable = newCapTable;
+            state.round = 3;
+            saveState(state);
+            render();
+        }
+
+        function calculateWaterfall(exitValue) {
+            const totalShares = calculateFullyDiluted(state.capTable);
+            let remaining = exitValue;
+            const distribution = [];
+            
+            const sortedInvestors = [...state.capTable.investors].sort((a, b) => {
+                const order = { 'Series B': 0, 'Series A': 1, 'Seed': 2 };
+                return order[a.round] - order[b.round];
+            });
+            
+            for (const investor of sortedInvestors) {
+                if (investor.preferenceAmount > 0 && remaining > 0) {
+                    const payment = Math.min(investor.preferenceAmount, remaining);
+                    distribution.push({
+                        stakeholder: investor.name,
+                        amount: payment,
+                        reason: `${investor.liquidationPreference} preference`
+                    });
+                    remaining -= payment;
+                    
+                    if (investor.liquidationPreference.includes('participating') && remaining > 0) {
+                        const participation = (investor.shares / totalShares) * remaining;
+                        distribution.push({
+                            stakeholder: investor.name,
+                            amount: participation,
+                            reason: 'Participation in remaining proceeds'
+                        });
+                        remaining -= participation;
+                    }
+                }
+            }
+            
+            if (remaining > 0) {
+                state.capTable.founders.forEach(founder => {
+                    const founderPayout = (founder.shares / totalShares) * remaining;
+                    distribution.push({
+                        stakeholder: founder.name,
+                        amount: founderPayout,
+                        reason: 'Common stock distribution'
+                    });
+                });
+            }
+            
+            return distribution;
+        }
+
+        // Render functions
+        function renderProgressBar() {
+            const steps = ['Initial', 'Seed', 'Series A', 'Series B', 'Analysis'];
+            const progressBar = document.getElementById('progressBar');
+            
+            let html = '';
+            steps.forEach((step, idx) => {
+                html += `
+                    <div class="progress-step">
+                        <div class="step-circle ${idx <= state.round ? 'active' : ''}">${idx + 1}</div>
+                        ${idx < steps.length - 1 ? `<div class="step-line ${idx < state.round ? 'active' : ''}"></div>` : ''}
+                    </div>
+                `;
+            });
+            
+            progressBar.innerHTML = html;
+        }
+
+        function renderRound0() {
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>👥</span>
+                            Initial Cap Table - January 2023
+                        </h2>
+                        <p class="card-subtitle">FitTech Solutions has been incorporated with 10M authorized shares</p>
+                    </div>
+                    
+                    <div class="stakeholder-list">
+                        ${state.capTable.founders.map(founder => `
+                            <div class="stakeholder-item founder">
+                                <div>
+                                    <div class="stakeholder-name">${founder.name}</div>
+                                    <div class="stakeholder-role">${founder.role}</div>
+                                </div>
+                                <div class="stakeholder-value">
+                                    <div class="stakeholder-percentage">${formatPercent(founder.percentage)}</div>
+                                    <div class="stakeholder-shares">${formatNumber(founder.shares)} shares</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>💰</span>
+                            Seed Round - June 2023
+                        </h2>
+                        <p class="card-subtitle">Angel investors want to invest $1.5M at a $4.5M pre-money valuation</p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>⚠ Critical Decision:</strong>
+                        Investors insist on a 15% employee option pool. Should it be created pre-money or post-money?
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="info-box yellow">
+                            <h4>Pre-Money Pool</h4>
+                            <p>Pool created before valuation. Founders diluted more, but cleaner cap table.</p>
+                        </div>
+                        <div class="info-box blue">
+                            <h4>Post-Money Pool</h4>
+                            <p>Pool created after investment. Founders less diluted, investors share the burden.</p>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="handleSeedRound('pre-money')">
+                            Create Pre-Money Pool
+                        </button>
+                        <button class="btn btn-primary" onclick="handleSeedRound('post-money')">
+                            Create Post-Money Pool
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRound1() {
+            const totalShares = calculateFullyDiluted(state.capTable);
+            const founderDilution = state.capTable.founders.reduce((sum, f) => sum + f.percentage, 0);
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Post-Seed Cap Table</h2>
+                        <p class="card-subtitle">You chose ${state.decisions.seedOptionPoolTiming} option pool creation</p>
+                    </div>
+
+                    <div class="stakeholder-list">
+                        <h3 style="margin-bottom: 12px;">Founders</h3>
+                        ${state.capTable.founders.map((founder, idx) => {
+                            const originalPercent = [40, 35, 25][idx];
+                            return `
+                                <div class="stakeholder-item founder">
+                                    <div class="stakeholder-name">${founder.name}</div>
+                                    <div class="stakeholder-value">
+                                        <div class="stakeholder-percentage">${formatPercent(founder.percentage)}</div>
+                                        <div class="stakeholder-shares">(was ${originalPercent}%)</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+
+                        <h3 style="margin: 20px 0 12px 0;">Investors</h3>
+                        ${state.capTable.investors.map(inv => `
+                            <div class="stakeholder-item investor">
+                                <div>
+                                    <div class="stakeholder-name">${inv.name}</div>
+                                    <div class="stakeholder-role">
+                                        ${formatCurrency(inv.investment)} @ ${inv.pricePerShare.toFixed(4)}/share
+                                    </div>
+                                </div>
+                                <div class="stakeholder-value">
+                                    <div class="stakeholder-percentage">${formatPercent(inv.percentage)}</div>
+                                    <div class="stakeholder-shares">${inv.liquidationPreference}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+
+                        <div class="stakeholder-item option-pool">
+                            <div class="stakeholder-name">Option Pool</div>
+                            <div class="stakeholder-percentage">
+                                ${formatPercent((state.capTable.optionPool.reserved / totalShares * 100))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="toggle-btn" onclick="state.showCalculations = !state.showCalculations; render();">
+                        ${state.showCalculations ? 'Hide' : 'Show'} Detailed Calculations
+                    </button>
+
+                    ${state.showCalculations ? `
+                        <div class="calculations-detail">
+                            <div><strong>Total Fully Diluted Shares:</strong> ${formatNumber(totalShares)}</div>
+                            <div><strong>Founder Dilution:</strong> Founders went from 100% to ${formatPercent(founderDilution)}</div>
+                            <div><strong>Key Insight:</strong> ${state.decisions.seedOptionPoolTiming === 'pre-money' 
+                                ? 'Founders bore the full cost of the option pool dilution'
+                                : 'Option pool dilution was shared between founders and investors'
+                            }</div>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>📈</span>
+                            Series A - March 2024
+                        </h2>
+                        <p class="card-subtitle">Strong traction! Summit Ventures offers $8M at $20M pre-money</p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Situation:</strong> Only 5% of the option pool has been used. 
+                        VCs want the pool increased to 18% total to hire senior engineers. 
+                        This will dilute founders further before the investment.
+                    </div>
+
+                    <div class="info-box" style="margin-bottom: 20px;">
+                        <h4>Investment Terms</h4>
+                        <ul style="margin-left: 20px;">
+                            <li>Investment: $8,000,000</li>
+                            <li>Pre-money: $20,000,000</li>
+                            <li>Post-money: $28,000,000</li>
+                            <li>Liquidation: 1x participating preferred</li>
+                            <li>Anti-dilution: Broad-based weighted average</li>
+                        </ul>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="handleSeriesA(false)">
+                            Keep 15% Pool (Risky for hiring)
+                        </button>
+                        <button class="btn btn-primary" onclick="handleSeriesA(true)">
+                            Increase to 18% Pool
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRound2() {
+            const totalShares = calculateFullyDiluted(state.capTable);
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Post-Series A Cap Table</h2>
+                    </div>
+
+                    <div class="stakeholder-list">
+                        <h3 style="margin-bottom: 12px;">Founders</h3>
+                        ${state.capTable.founders.map(founder => `
+                            <div class="stakeholder-item founder">
+                                <div class="stakeholder-name">${founder.name}</div>
+                                <div class="stakeholder-percentage">${formatPercent(founder.percentage)}</div>
+                            </div>
+                        `).join('')}
+
+                        <h3 style="margin: 20px 0 12px 0;">Investors</h3>
+                        ${state.capTable.investors.map(inv => `
+                            <div class="stakeholder-item investor">
+                                <div class="stakeholder-name">${inv.name} (${inv.round})</div>
+                                <div class="stakeholder-percentage">${formatPercent(inv.percentage)}</div>
+                            </div>
+                        `).join('')}
+
+                        <div class="stakeholder-item option-pool">
+                            <div class="stakeholder-name">Option Pool</div>
+                            <div class="stakeholder-percentage">
+                                ${formatPercent((state.capTable.optionPool.reserved / totalShares * 100))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span class="warning-text">⚠️</span>
+                            Series B - Down Round Crisis (November 2024)
+                        </h2>
+                        <p class="card-subtitle">Growth stalled. Valuation dropped to $18M (from $28M). Only 4 months runway left.</p>
+                    </div>
+
+                    <div class="alert">
+                        <strong>Critical Situation:</strong> Phoenix Capital will invest $5M at $18M pre-money.
+                        This triggers anti-dilution protection and pay-to-play provisions.
+                    </div>
+
+                    <div class="info-box" style="margin-bottom: 20px;">
+                        <h4>Investment Terms</h4>
+                        <ul style="margin-left: 20px;">
+                            <li>Investment: $5,000,000</li>
+                            <li class="warning-text">Pre-money: $18,000,000 (DOWN from $28M)</li>
+                            <li>Liquidation: 2x non-participating</li>
+                            <li class="warning-text">Pay-to-play: Series A must invest pro-rata or convert to common</li>
+                        </ul>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <h4 style="margin-bottom: 12px;">Who will participate in the down round?</h4>
+                        
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="summitVentures" 
+                                ${state.decisions.downRoundParticipation.summitVentures ? 'checked' : ''}
+                                onchange="state.decisions.downRoundParticipation.summitVentures = this.checked; saveState(state);">
+                            <div class="checkbox-content">
+                                <div class="checkbox-title">Summit Ventures (Series A lead)</div>
+                                <div class="checkbox-description">Will invest additional $2M to maintain position</div>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="seedAngels"
+                                ${state.decisions.downRoundParticipation.seedAngels ? 'checked' : ''}
+                                onchange="state.decisions.downRoundParticipation.seedAngels = this.checked; saveState(state);">
+                            <div class="checkbox-content">
+                                <div class="checkbox-title">Seed Angels</div>
+                                <div class="checkbox-description">
+                                    ${state.decisions.downRoundParticipation.seedAngels 
+                                        ? 'Will participate to keep preferred status' 
+                                        : 'Will NOT participate (convert to common stock)'}
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="sarah"
+                                ${state.decisions.downRoundParticipation.sarah ? 'checked' : ''}
+                                onchange="state.decisions.downRoundParticipation.sarah = this.checked; saveState(state);">
+                            <div class="checkbox-content">
+                                <div class="checkbox-title">Sarah Chen (CEO)</div>
+                                <div class="checkbox-description">Will invest $500K from personal savings</div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary" 
+                        onclick="handleSeriesB(state.decisions.downRoundParticipation)"
+                        ${!state.decisions.downRoundParticipation.summitVentures && 
+                          !state.decisions.downRoundParticipation.seedAngels && 
+                          !state.decisions.downRoundParticipation.sarah ? 'disabled' : ''}>
+                        Execute Down Round →
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderRound3() {
+            const totalShares = calculateFullyDiluted(state.capTable);
+            const sarah = state.capTable.founders.find(f => f.name === 'Sarah Chen');
+            const sarahInitialPercent = 40;
+            const totalCapitalRaised = state.capTable.investors.reduce((sum, inv) => sum + inv.investment, 0);
+            const liquidationStack = state.capTable.investors.reduce((sum, inv) => sum + (inv.preferenceAmount || 0), 0);
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Final Cap Table - Post Series B</h2>
+                        <p class="card-subtitle">The complete ownership structure after the down round</p>
+                    </div>
+
+                    <div class="stakeholder-list">
+                        <h3 style="margin-bottom: 12px;">Founders</h3>
+                        ${state.capTable.founders.map((founder, idx) => {
+                            const originalPercent = [40, 35, 25][idx];
+                            return `
+                                <div class="stakeholder-item founder">
+                                    <div>
+                                        <div class="stakeholder-name">${founder.name}</div>
+                                        ${founder.personalInvestment ? `
+                                            <div class="stakeholder-role success-text">
+                                                + ${formatCurrency(founder.personalInvestment)} personal investment
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="stakeholder-value">
+                                        <div class="stakeholder-percentage">${formatPercent(founder.percentage)}</div>
+                                        <div class="stakeholder-shares">(started at ${originalPercent}%)</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+
+                        <h3 style="margin: 20px 0 12px 0;">Investors</h3>
+                        ${state.capTable.investors.map(inv => `
+                            <div class="stakeholder-item investor">
+                                <div>
+                                    <div class="stakeholder-name">${inv.name} (${inv.round})</div>
+                                    <div class="stakeholder-role">${inv.liquidationPreference}</div>
+                                    ${inv.followOn ? `
+                                        <div class="stakeholder-role success-text">
+                                            + ${formatCurrency(inv.followOn)} follow-on
+                                        </div>
+                                    ` : ''}
+                                    ${inv.antiDilutionAdjustment ? `
+                                        <div class="stakeholder-role" style="color: #2563eb;">
+                                            + ${formatNumber(inv.antiDilutionAdjustment)} anti-dilution shares
+                                        </div>
+                                    ` : ''}
+                                    ${inv.convertedToCommon ? `
+                                        <div class="stakeholder-role warning-text">
+                                            ⚠ Converted to common (didn't participate)
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="stakeholder-value">
+                                    <div class="stakeholder-percentage">${formatPercent(inv.percentage)}</div>
+                                    <div class="stakeholder-shares">${formatCurrency(inv.investment)} invested</div>
+                                </div>
+                            </div>
+                        `).join('')}
+
+                        <div class="stakeholder-item option-pool">
+                            <div class="stakeholder-name">Option Pool (reserved)</div>
+                            <div class="stakeholder-percentage">
+                                ${formatPercent(state.capTable.optionPool.percentage)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights-box">
+                        <h4>Key Insights</h4>
+                        <ul>
+                            <li>Sarah's ownership: ${sarahInitialPercent}% → ${formatPercent(sarah.percentage)} 
+                                (${((sarahInitialPercent - sarah.percentage) / sarahInitialPercent * 100).toFixed(1)}% dilution)</li>
+                            <li>Total capital raised: ${formatCurrency(totalCapitalRaised)}</li>
+                            <li>Company valuation dropped from $28M → $18M (down round)</li>
+                            <li class="warning-text">Liquidation preference stack: ${formatCurrency(liquidationStack)} 
+                                must be paid before common gets anything</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span>📊</span>
+                            Exit Scenario Analysis
+                        </h2>
+                        <p class="card-subtitle">See how different exit values affect each stakeholder</p>
+                    </div>
+
+                    ${[10000000, 25000000, 50000000, 100000000].map(exitValue => {
+                        const waterfall = calculateWaterfall(exitValue);
+                        const sarahTotal = waterfall
+                            .filter(d => d.stakeholder === 'Sarah Chen')
+                            .reduce((sum, d) => sum + d.amount, 0);
+                        
+                        return `
+                            <div class="exit-scenario">
+                                <h4>Exit at ${formatCurrency(exitValue / 1000000)}M</h4>
+                                <div class="exit-metric">
+                                    <span>Sarah's payout:</span>
+                                    <span class="exit-value">${formatCurrency(Math.round(sarahTotal / 1000000))}M</span>
+                                </div>
+                                <div class="exit-metric">
+                                    <span>Return on her initial equity:</span>
+                                    <span>${((sarahTotal / (exitValue * 0.40)) * 100).toFixed(1)}% of what she would have gotten at founding</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+
+                    <div class="alert" style="margin-top: 20px;">
+                        <strong>Key Lesson:</strong> Notice how liquidation preferences create a "preference stack" 
+                        that must be paid before common shareholders (founders) receive anything. In low exit scenarios, 
+                        founders can get wiped out entirely despite owning significant percentage of the company.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Assignment Questions</h2>
+                    </div>
+
+                    <div class="question-box">
+                        <strong>1. Dilution Analysis:</strong> Calculate Sarah's total dilution from founding to Series B. 
+                        What percentage was due to investments vs. option pool creation?
+                    </div>
+
+                    <div class="question-box">
+                        <strong>2. Decision Evaluation:</strong> Was creating the option pool pre-money or post-money 
+                        in the Seed round the right decision? Justify with calculations.
+                    </div>
+
+                    <div class="question-box">
+                        <strong>3. Anti-Dilution Impact:</strong> How many additional shares did Summit Ventures receive 
+                        due to anti-dilution protection? Show the weighted average calculation.
+                    </div>
+
+                    <div class="question-box">
+                        <strong>4. Exit Threshold:</strong> At what exit valuation does Sarah make at least $5M? 
+                        How does this compare to what she would have made if there was no liquidation preference stack?
+                    </div>
+
+                    <div class="question-box">
+                        <strong>5. Alternative Structures:</strong> What other financing structures could have been 
+                        used instead of the Series B down round? (Consider: bridge loans, convertible notes, SAFE, etc.)
+                    </div>
+
+                    <div class="question-box">
+                        <strong>6. Ethical Considerations:</strong> Was the pay-to-play provision fair to smaller 
+                        angel investors who may not have had capital to participate? Discuss.
+                    </div>
+
+                    <button class="reset-btn" onclick="resetSimulation()">
+                        Reset Simulation
+                    </button>
+                </div>
+            `;
+        }
+
+        function render() {
+            renderProgressBar();
+            
+            const content = document.getElementById('content');
+            let html = '';
+            
+            switch(state.round) {
+                case 0:
+                    html = renderRound0();
+                    break;
+                case 1:
+                    html = renderRound1();
+                    break;
+                case 2:
+                    html = renderRound2();
+                    break;
+                case 3:
+                    html = renderRound3();
+                    break;
+            }
+            
+            content.innerHTML = html;
+        }
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
